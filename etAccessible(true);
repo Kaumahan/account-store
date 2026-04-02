@@ -1,0 +1,61 @@
+[90m= [39m[34;4mReflectionClass[39;24m {#7556
+    +[1mname[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+    [34mimplements[39m: [],
+    [34mconstants[39m: [],
+    [34mproperties[39m: [
+      [34m"[39m[34mapiKey[39m[34m"[39m => [34;4mReflectionProperty[39;24m {#7522
+        +[1mname[22m: [32m"[39m[32mapiKey[39m[32m"[39m,
+        +[1mclass[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+        [34mmodifiers[39m: [32m"[39m[32mpublic[39m[32m"[39m,
+        [34mextra[39m: {
+          [34mdocComment[39m: [32m"[39m[32m/** @var string PayMongo API key used for authenticating and performing PayMongo API operations. */[39m[32m"[39m,
+        },
+      },
+      [34m"[39m[34mapiBaseUrl[39m[34m"[39m => [34;4mReflectionProperty[39;24m {#7555
+        +[1mname[22m: [32m"[39m[32mapiBaseUrl[39m[32m"[39m,
+        +[1mclass[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+        [34mmodifiers[39m: [32m"[39m[32mpublic[39m[32m"[39m,
+        [34mextra[39m: {
+          [34mdocComment[39m: [32m"[39m[32m/** @var string PayMongo API Base Url */[39m[32m"[39m,
+        },
+      },
+      [34m"[39m[34mapiVersion[39m[34m"[39m => [34;4mReflectionProperty[39;24m {#7553
+        +[1mname[22m: [32m"[39m[32mapiVersion[39m[32m"[39m,
+        +[1mclass[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+        [34mmodifiers[39m: [32m"[39m[32mpublic[39m[32m"[39m,
+        [34mextra[39m: {
+          [34mdocComment[39m: [32m"[39m[32m/** @var string PayMongo API current API version  */[39m[32m"[39m,
+        },
+      },
+    ],
+    [34mmethods[39m: [
+      [34m"[39m[34m__construct[39m[34m"[39m => [34;4mReflectionMethod[39;24m {#7552
+        +[1mname[22m: [32m"[39m[32m__construct[39m[32m"[39m,
+        +[1mclass[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+        [34mparameters[39m: {
+          [34m$apiKey[39m: [34;4mReflectionParameter[39;24m {#7602
+            +[1mname[22m: [32m"[39m[32mapiKey[39m[32m"[39m,
+            [34mposition[39m: [35m0[39m,
+            [34mdefault[39m: [32m""[39m,
+          },
+        },
+        [34mmodifiers[39m: [32m"[39m[32mpublic[39m[32m"[39m,
+      },
+      [34m"[39m[34mgetApiUrl[39m[34m"[39m => [34;4mReflectionMethod[39;24m {#7551
+        +[1mname[22m: [32m"[39m[32mgetApiUrl[39m[32m"[39m,
+        +[1mclass[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+        [34mmodifiers[39m: [32m"[39m[32mpublic static[39m[32m"[39m,
+      },
+      [34m"[39m[34m__get[39m[34m"[39m => [34;4mReflectionMethod[39;24m {#7550
+        +[1mname[22m: [32m"[39m[32m__get[39m[32m"[39m,
+        +[1mclass[22m: [32m"[39m[32mPaymongo[39m\\[32mPaymongoClient[39m[32m"[39m,
+        [34mparameters[39m: {
+          [34m$name[39m: [34;4mReflectionParameter[39;24m {#7600
+            +[1mname[22m: [32m"[39m[32mname[39m[32m"[39m,
+            [34mposition[39m: [35m0[39m,
+          },
+        },
+        [34mmodifiers[39m: [32m"[39m[32mpublic[39m[32m"[39m,
+      },
+    ],
+  }
