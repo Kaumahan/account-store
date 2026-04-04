@@ -8,12 +8,16 @@ use App\Events\MessageSent;
 use App\Models\Message;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PayMongoWebhookController;
+
 use App\Http\Controllers\Auth\GoogleController;
 
 // --- Public Routes ---
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+Route::post('/paymongo/webhook', [PayMongoWebhookController::class, 'handle']);
+Route::post('/paymongo/callback', [PayMongoWebhookController::class, 'handle']);
 
 // --- Authenticated Routes ---
 Route::middleware('auth')->group(function () {

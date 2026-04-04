@@ -3,47 +3,54 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Payment;
 use Illuminate\Support\Facades\Http;
 
 class PaymentController extends Controller
 {
     public function checkout(Product $product)
     {
-        // 1. Get Secret Key
         $secretKey = config('services.paymongo.secret_key');
 
-        // 2. Make the Request
-        // Added the missing '->' before withBasicAuth
-        $response = Http::withoutVerifying()
-            ->withBasicAuth($secretKey, '') 
+        $response = Http::withBasicAuth($secretKey, '')
             ->post('https://api.paymongo.com/v1/checkout_sessions', [
                 'data' => [
                     'attributes' => [
                         'line_items' => [
                             [
                                 'currency' => 'PHP',
-                                'amount'   => (int) ($product->price * 100), 
-                                'name'     => $product->name,
+                                'amount' => (int) ($product->price * 100),
+                                'name' => $product->name,
                                 'quantity' => 1,
                             ]
                         ],
                         'payment_method_types' => ['gcash', 'paymaya', 'card'],
-                        'success_url' => url('/'), 
-                        'cancel_url'  => url('/'),
+                        'success_url' => url('/payment/success'),
+                        'cancel_url' => url('/payment/failed'),
+                        'metadata' => [
+                            'user_id' => auth()->id(),
+                            'product_id' => $product->id,
+                            'referrer_id' => request()->cookie('referrer_id'), // For your ₱15 points
+                        ]
                     ]
                 ]
             ]);
 
-        // 3. Handle Errors
-        if ($response->failed()) {
-            logger()->error('PayMongo Checkout Failed', [
-                'status' => $response->status(),
-                'error'  => $response->json()
+        if ($response->successful()) {
+            $data = $response->json('data');
+
+            // Record the attempt in our database
+            Payment::create([
+                'user_id' => auth()->id(),
+                'product_id' => $product->id,
+                'checkout_session_id' => $data['id'],
+                'amount' => $product->price,
+                'status' => 'pending',
             ]);
-            return back()->withErrors('Payment gateway is currently unavailable.');
+
+            return redirect($data['attributes']['checkout_url']);
         }
 
-        // 4. Redirect to PayMongo
-        return redirect($response->json('data.attributes.checkout_url'));
+        return back()->withErrors('Gateway error.');
     }
 }

@@ -127,34 +127,26 @@ const openChat = () => {
     scrollToBottom();
 };
 
+// window.Echo.private(`App.Models.User.${userId}`)
+//     .notification((notification) => {
+//         // Use a library like 'vue-toastification' or a custom Tailwind ref
+//         alert(notification.message); 
+//     });
+
 const sendMessage = async (content = null) => {
     const textToSend = content || newMessage.value;
     if (!textToSend.trim()) return;
 
-    // Save the message so we can clear the input early for a better UI feel
-    const currentInput = newMessage.value;
-    if (!content) newMessage.value = ''; 
+    const originalText = newMessage.value;
+    if (!content) newMessage.value = ''; // Clear input if it wasn't a GIF
 
     try {
-        // 1. Send to Laravel
         const response = await axios.post('/chat', { body: textToSend });
-
-        // 2. MANUALLY PUSH to the local messages array
-        // This ensures the sender sees their own message immediately
-        const newMessageObj = response.data;
-        
-        // Prevent duplicate if Echo also catches it
-        if (!messages.value.find(m => m.id === newMessageObj.id)) {
-            messages.value.push(newMessageObj);
-        }
-
+        // Optional: messages.value.push(response.data); // Only if Reverb doesn't echo to self
         scrollToBottom();
-        showGifPicker.value = false;
     } catch (error) {
         console.error("Chat Error:", error);
-        // Put the text back if it failed
-        if (!content) newMessage.value = currentInput;
-        alert("Failed to send message. Are you logged in?");
+        if (!content) newMessage.value = originalText;
     }
 };
 
@@ -177,4 +169,5 @@ onMounted(async () => {
         });
     }
 });
+
 </script>

@@ -1,4 +1,9 @@
 services:
+    app:
+     deploy:
+       resources:
+         limits:
+          memory:512M
     laravel.test:
         build:
             context: ./docker/8.5
