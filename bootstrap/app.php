@@ -12,9 +12,16 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trustProxies(at: '*');
+    })
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [
-            'webhooks/paymongo', // Allow PayMongo to talk to your server
+            'paymongo/callback',
+            'chat',
+            'chat/*',
+            'reverb/*'
         ]);
+        $middleware->trustProxies(at: '*');
     })
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->validateCsrfTokens(except: [

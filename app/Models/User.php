@@ -7,6 +7,8 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Payment;
 
 class User extends Authenticatable
 {
@@ -45,5 +47,17 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // Get all payments made by the user
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+    
+    // Pro-tip: Get only successful purchases directly
+    public function successfulPurchases()
+    {
+        return $this->hasMany(Payment::class)->where('status', 'succeeded');
     }
 }

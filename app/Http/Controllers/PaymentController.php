@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Http;
 
 class PaymentController extends Controller
 {
+    public function purchases()
+    {
+        $payments = Payment::with(['product', 'stock'])
+            ->where('user_id', auth()->id())
+            ->where('status', 'succeeded')
+            ->latest()
+            ->get();
+
+        // Check if the stock is attached:
+        // dd($payments->first()->stock); 
+
+        return view('purchases', compact('payments'));
+    }
     public function checkout(Product $product)
     {
         $secretKey = config('services.paymongo.secret_key');
@@ -24,7 +37,7 @@ class PaymentController extends Controller
                                 'quantity' => 1,
                             ]
                         ],
-                        'payment_method_types' => ['gcash', 'paymaya', 'card'],
+                        'payment_method_types' => ['qrph'],
                         'success_url' => url('/payment/success'),
                         'cancel_url' => url('/payment/failed'),
                         'metadata' => [

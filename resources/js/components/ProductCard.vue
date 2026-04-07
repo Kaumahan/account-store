@@ -8,7 +8,7 @@
       />
       <div class="absolute top-3 left-3">
         <span v-if="product.stock > 0" class="rounded-full bg-emerald-500/90 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-          In Stock
+          In Stock {{ product.stock }}
         </span>
         <span v-else class="rounded-full bg-rose-500/90 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur-sm">
           Sold Out
@@ -21,7 +21,7 @@
         <h3 class="text-sm font-medium text-slate-900 line-clamp-1">
           {{ product.name }}
         </h3>
-        <p class="text-lg font-bold text-indigo-600">${{ product.price }}</p>
+        <p class="text-lg font-bold text-indigo-600">₱{{ product.price }}</p>
       </div>
 
       <p class="mb-4 text-xs text-slate-500 line-clamp-2 italic">
@@ -29,18 +29,11 @@
       </p>
 
       <button 
-        :disabled="product.stock <= 0"
-        class="mt-auto w-full rounded-lg bg-slate-900 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-      >
-        {{ product.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
-      </button>
-
-      <button 
         @click="handlePayment(product.id)"
         :disabled="product.stock <= 0"
         class="mt-auto w-full rounded-lg bg-indigo-600 py-2.5 text-sm font-semibold text-white hover:bg-indigo-700 transition-colors"
         >
-        Buy with GCash / Card
+        GCash / Card
         </button>
     </div>
   </div>
