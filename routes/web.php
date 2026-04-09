@@ -14,42 +14,45 @@ use App\Http\Controllers\RedemptionController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\GoogleController;
 
-// --- Public Routes ---
-Route::view('/', 'welcome');
-Route::view('/payment/success', 'success');
-Route::view('/payment/failed', 'failed');
-Route::get('/', [ProductController::class, 'index']);
-Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('login.google');
-Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
-Route::post('/paymongo/callback', [PayMongoWebhookController::class, 'handle']);
+/*
+|--------------------------------------------------------------------------
+| Public Routes (Throttled to prevent scraping/flooding)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('throttle:60,1')->group(function () {
+    Route::get('/', [ProductController::class, 'index']);
+    Route::view('/payment/success', 'success');
+    Route::view('/payment/failed', 'failed');
+});
 
-// --- Authenticated Routes ---
-Route::middleware('auth')->group(function () {
-    Route::post('/redeem', [RedemptionController::class, 'store'])->name('redeem.store')->middleware('throttle:2,1');
-    // --- Admin Only Section ---
-    Route::middleware('admin')->prefix('admin')->group(function () {
-        Route::get('/payouts', [AdminController::class, 'payouts'])->name('admin.payouts');
-        Route::post('/payouts/{redemption}/approve', [AdminController::class, 'approve'])->name('admin.approve');
-    });
+// Authentication Throttling (Prevent brute-force attempts)
+Route::middleware('throttle:10,1')->group(function () {
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('login.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
+});
 
-    Route::post('/stocks', [StockController::class, 'store'])->name('stocks.store');
-    Route::get('/inventory', [StockController::class, 'index'])->name('stocks.index');
-    Route::post('/inventory/store', [StockController::class, 'store'])->name('stocks.store');
-    Route::get('/inventory/data', [ProductController::class, 'index']);
-    // web.php
-    Route::get('/inventory', [ProductController::class, 'ownProducts'])->name('stocks.index');
+// Webhooks: Higher limit to allow PayMongo bursts, but still protected
+Route::post('/paymongo/callback', [PayMongoWebhookController::class, 'handle'])
+    ->middleware('throttle:100,1');
 
+/*
+|--------------------------------------------------------------------------
+| Authenticated Routes
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'throttle:120,1'])->group(function () {
 
-    Route::post('/inventory/store', [ProductController::class, 'store'])->name('products.store');
-    Route::delete('/inventory/{product}', [ProductController::class, 'destroy']);
+    // --- High-Value Transactions (Heavily Protected) ---
+    // Prevent automated balance drain or ticket-buying bots
+    Route::post('/redeem', [RedemptionController::class, 'store'])
+        ->name('redeem.store')
+        ->middleware('throttle:2,1');
 
+    Route::post('/checkout/{product}', [PaymentController::class, 'checkout'])
+        ->name('checkout')
+        ->middleware('throttle:5,1');
 
-    // Product CRUD (For the Table)
-    Route::post('/inventory/products', [ProductController::class, 'store'])->name('inventory.store');
-    Route::get('/inventory/products/{product}/edit', [ProductController::class, 'edit'])->name('inventory.edit');
-    Route::put('/inventory/products/{product}', [ProductController::class, 'update'])->name('inventory.update');
-    Route::delete('/inventory/products/{product}', [ProductController::class, 'destroy'])->name('inventory.destroy');
-    // Get Chat History
+    // --- Real-time Chat Logic ---
     Route::get('/chat/messages', function () {
         return Message::with('user')
             ->latest()
@@ -59,29 +62,41 @@ Route::middleware('auth')->group(function () {
             ->values();
     });
 
-    // Send Message (CLEANED UP - Only one route now)
     Route::post('/chat', function (Request $request) {
-
-        $request->validate(['body' => 'required|string']);
+        $request->validate(['body' => 'required|string|max:1000']);
 
         $message = Message::create([
             'user_id' => Auth::id(),
             'body' => $request->body
         ]);
 
-        // Load user so Vue knows WHO sent it
         $message->load('user');
-
-        // Broadcast to everyone else
-        // NOTE: Use broadcast(new MessageSent($message)) without ->toOthers() 
-        // if you want to see your own message appear via Echo.
         broadcast(new MessageSent($message))->toOthers();
 
         return response()->json($message);
+    })->middleware('throttle:15,1'); // Prevents chat spamming
+
+    // --- Inventory & Product Management ---
+    Route::post('/stocks', [StockController::class, 'store'])->name('stocks.store');
+    Route::get('/inventory/data', [ProductController::class, 'index']);
+    Route::prefix('inventory')->group(function () {
+        Route::get('/', [ProductController::class, 'ownProducts'])->name('stocks.index');
+        Route::post('/store', [ProductController::class, 'store'])->name('products.store');
+        Route::delete('/{product}', [ProductController::class, 'destroy'])->name('inventory.destroy');
+
+        // Product CRUD
+        Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('inventory.edit');
+        Route::put('/products/{product}', [ProductController::class, 'update'])->name('inventory.update');
     });
 
-    Route::post('/checkout/{product}', [PaymentController::class, 'checkout'])->name('checkout');
+    // --- User Profile/Vault ---
     Route::get('/my-purchases', [PaymentController::class, 'purchases'])->name('purchases.index');
+
+    // --- Admin Section ---
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/payouts', [AdminController::class, 'payouts'])->name('admin.payouts');
+        Route::post('/payouts/{redemption}/approve', [AdminController::class, 'approve'])->name('admin.approve');
+    });
 
     Route::post('/logout', function () {
         Auth::logout();
