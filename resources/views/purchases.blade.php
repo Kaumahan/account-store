@@ -22,7 +22,7 @@
                             :product='{!! json_encode($payment->product) !!}' 
                             :credentials='{!! json_encode([
                                 "account_data" => $payment->stock->data,
-                                "guide" => $payment->product->description
+                                "guide" => $payment->product->description ?? ""
                             ]) !!}'>
                         </product-credential-card>
                     </div>

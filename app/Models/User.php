@@ -2,62 +2,62 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Payment;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
+        'is_admin',
+        'current_balance'
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Unified casting logic
      */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
+            'current_balance' => 'decimal:2', // Ensures 0.01 stays 0.01
         ];
     }
 
-    // Get all payments made by the user
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
-    
-    // Pro-tip: Get only successful purchases directly
-    public function successfulPurchases()
+
+    public function products(): HasMany
     {
-        return $this->hasMany(Payment::class)->where('status', 'succeeded');
+        return $this->hasMany(Product::class);
     }
+
+    public function stocks(): HasMany
+    {
+        return $this->hasMany(Stock::class);
+    }
+
+    public function redemptions()
+    {
+        return $this->hasMany(Redemption::class);
+    }
+
+
+    // REMOVED: getCurrentBalanceAttribute 
+    // We are now using the database column directly.
 }

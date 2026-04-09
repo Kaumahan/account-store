@@ -1,26 +1,28 @@
-<?php
-
+<?php 
 namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Request; // Added for type-hinting if needed
 
 class PaymentController extends Controller
 {
     public function purchases()
     {
-        $payments = Payment::with(['product', 'stock'])
-            ->where('user_id', auth()->id())
-            ->where('status', 'succeeded')
-            ->latest()
-            ->get();
-
-        // Check if the stock is attached:
-        // dd($payments->first()->stock); 
+        // withTrashed() here is correct. 
+        // Ensure Product and Stock models have "use SoftDeletes;" inside them.
+        $payments = Payment::with([
+            'product' => fn($q) => $q->withTrashed(),
+        ])
+        ->where('user_id', auth()->id())
+        ->where('status', 'succeeded')
+        ->latest()
+        ->get();
 
         return view('purchases', compact('payments'));
     }
+
     public function checkout(Product $product)
     {
         $secretKey = config('services.paymongo.secret_key');
@@ -32,18 +34,18 @@ class PaymentController extends Controller
                         'line_items' => [
                             [
                                 'currency' => 'PHP',
-                                'amount' => (int) ($product->price * 100),
+                                'amount' => (int) ($product->price * 100), // Convert to cents
                                 'name' => $product->name,
                                 'quantity' => 1,
                             ]
                         ],
-                        'payment_method_types' => ['qrph'],
+                        'payment_method_types' => ['qrph', 'gcash', 'paymaya'], // Added more local options
                         'success_url' => url('/payment/success'),
                         'cancel_url' => url('/payment/failed'),
                         'metadata' => [
-                            'user_id' => auth()->id(),
-                            'product_id' => $product->id,
-                            'referrer_id' => request()->cookie('referrer_id'), // For your ₱15 points
+                            'user_id' => (string) auth()->id(),
+                            'product_id' => (string) $product->id,
+                            'referrer_id' => (string) request()->cookie('referrer_id', ''), 
                         ]
                     ]
                 ]
@@ -52,7 +54,6 @@ class PaymentController extends Controller
         if ($response->successful()) {
             $data = $response->json('data');
 
-            // Record the attempt in our database
             Payment::create([
                 'user_id' => auth()->id(),
                 'product_id' => $product->id,
@@ -64,6 +65,6 @@ class PaymentController extends Controller
             return redirect($data['attributes']['checkout_url']);
         }
 
-        return back()->withErrors('Gateway error.');
+        return back()->withErrors('Payment gateway is currently unavailable.');
     }
 }

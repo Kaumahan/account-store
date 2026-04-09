@@ -23,27 +23,43 @@
                         </h1>
                     </a>
                     @auth
-                        <nav class="hidden md:flex items-center gap-4">
-                            <a href="{{ route('purchases.index') }}"
-                                class="text-sm font-medium text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                My Purchases
-                            </a>
+                        @auth
+                            <nav class="hidden md:flex items-center gap-6">
+                                {{-- Standard User Links --}}
+                                <a href="{{ route('purchases.index') }}"
+                                    class="text-sm font-medium text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
+                                    My Purchases
+                                </a>
+                                <a href="{{ route('stocks.index') }}"
+                                    class="text-sm font-medium {{ request()->routeIs('stocks.index') ? 'text-cyan-400' : 'text-gray-400' }} hover:text-cyan-400 transition-colors flex items-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                        stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                    Inventory
+                                </a>
+                                {{-- Admin Only Section --}}
+                                @if(auth()->user()->is_admin)
+                                    <div class="h-4 w-[1px] bg-gray-700 mx-2"></div> {{-- Vertical Separator --}}
 
-                            <a href="{{ route('stocks.index') }}"
-                                class="text-sm font-medium text-gray-400 hover:text-cyan-400 transition-colors flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                </svg>
-                                Inventory
-                            </a>
-                        </nav>
+                                    <a href="{{ route('admin.payouts') }}"
+                                        class="text-sm font-medium {{ request()->routeIs('admin.payouts') ? 'text-cyan-400' : 'text-gray-400' }} hover:text-cyan-400 transition-colors flex items-center gap-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                            stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                        </svg>
+                                        Payouts
+                                    </a>
+                                @endif
+                            </nav>
+                        @endauth
                     @endauth
                 </div>
 

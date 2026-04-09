@@ -15,8 +15,28 @@ class ProductController extends Controller
             ->where('stock', '>', 0)
             ->latest()
             ->get();
-
         return view('welcome', compact('products'));
+    }
+
+    public function ownProducts()
+    {
+        // Scoped specifically to the authenticated user via the relationship
+        $products = auth()->user()->products()
+            ->withCount([
+                'stocks as total_stock' => function ($query) {
+                    $query->where('is_sold', false);
+                }
+            ])
+            ->latest()
+            ->get();
+
+        // Pulling recent activity for the log section
+        $recentStocks = auth()->user()->stocks()
+            ->with('product')
+            ->latest()
+            ->get();
+
+        return view('stocks.index', compact('products', 'recentStocks'));
     }
 
     // CREATE: Store product and redirect back to Inventory
@@ -29,6 +49,7 @@ class ProductController extends Controller
             'stock' => 'nullable|integer|min:0',
         ]);
 
+        $data['user_id'] = auth()->id();
         $data['image_url'] = $request->input('image_url');
         $data['description'] = $request->input('details');
         $data['slug'] = Str::slug($data['name']) . '-' . rand(1000, 9999);

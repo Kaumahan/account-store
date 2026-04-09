@@ -14,11 +14,10 @@ class Payment extends Model
     /**
      * Get the product associated with the payment.
      */
-    public function product(): BelongsTo
+    public function product()
     {
         return $this->belongsTo(Product::class);
     }
-
     /**
      * Get the user who made the payment.
      */
@@ -31,5 +30,5 @@ class Payment extends Model
     {
         return $this->hasOne(Stock::class);
     }
-    
+
 }

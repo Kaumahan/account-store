@@ -10,10 +10,14 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PayMongoWebhookController;
+use App\Http\Controllers\RedemptionController;
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\GoogleController;
 
 // --- Public Routes ---
 Route::view('/', 'welcome');
+Route::view('/payment/success', 'success');
+Route::view('/payment/failed', 'failed');
 Route::get('/', [ProductController::class, 'index']);
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('login.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback']);
@@ -21,10 +25,21 @@ Route::post('/paymongo/callback', [PayMongoWebhookController::class, 'handle']);
 
 // --- Authenticated Routes ---
 Route::middleware('auth')->group(function () {
+    Route::post('/redeem', [RedemptionController::class, 'store'])->name('redeem.store')->middleware('throttle:2,1');
+    // --- Admin Only Section ---
+    Route::middleware('admin')->prefix('admin')->group(function () {
+        Route::get('/payouts', [AdminController::class, 'payouts'])->name('admin.payouts');
+        Route::post('/payouts/{redemption}/approve', [AdminController::class, 'approve'])->name('admin.approve');
+    });
+
     Route::post('/stocks', [StockController::class, 'store'])->name('stocks.store');
     Route::get('/inventory', [StockController::class, 'index'])->name('stocks.index');
     Route::post('/inventory/store', [StockController::class, 'store'])->name('stocks.store');
     Route::get('/inventory/data', [ProductController::class, 'index']);
+    // web.php
+    Route::get('/inventory', [ProductController::class, 'ownProducts'])->name('stocks.index');
+
+
     Route::post('/inventory/store', [ProductController::class, 'store'])->name('products.store');
     Route::delete('/inventory/{product}', [ProductController::class, 'destroy']);
 
