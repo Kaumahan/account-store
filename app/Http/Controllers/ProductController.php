@@ -25,6 +25,7 @@ class ProductController extends Controller
                 ->get(),
         ]);
 
+
         return view('welcome', compact('products'));
     }
 

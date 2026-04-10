@@ -49,8 +49,7 @@ Route::middleware(['auth', 'throttle:120,1'])->group(function () {
         ->middleware('throttle:2,1');
 
     Route::post('/checkout/{product}', [PaymentController::class, 'checkout'])
-        ->name('checkout')
-        ->middleware('throttle:5,1');
+        ->name('checkout');
 
     // --- Real-time Chat Logic ---
     Route::get('/chat/messages', function () {

@@ -22,9 +22,9 @@
             background-color: #0a0e18;
         }
 
+        /* Updated to be solid, not transparent */
         .glass-header {
-            background: rgba(10, 14, 24, 0.9);
-            backdrop-filter: blur(12px);
+            background: #0a0e18; 
             border-bottom: 1px solid rgba(51, 65, 85, 0.5);
         }
 
@@ -66,6 +66,14 @@
                                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all {{ request()->routeIs('stocks.index') ? 'bg-cyan-400/10 text-cyan-400' : 'text-slate-400 hover:text-white' }}">
                                     <i data-lucide="plus-square" class="w-3.5 h-3.5"></i> Add New Listing
                                 </a>
+
+                                {{-- Admin Payout Tab --}}
+                                @if(auth()->user()->is_admin)
+                                <a href="{{ url('admin/payout') }}"
+                                    class="flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all {{ request()->is('admin/payout*') ? 'bg-amber-400/10 text-amber-400' : 'text-slate-400 hover:text-white' }}">
+                                    <i data-lucide="wallet" class="w-3.5 h-3.5"></i> Admin Payout
+                                </a>
+                                @endif
                             </nav>
                         @endauth
                     </div>
@@ -74,12 +82,13 @@
                         @auth
                             <div class="hidden md:flex items-center gap-3 pr-4 border-r border-slate-800">
                                 <div class="text-right">
-                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Active
-                                        Operative</p>
+                                    <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">
+                                        {{ auth()->user()->is_admin ? 'Command Center' : 'Active Operative' }}
+                                    </p>
                                     <p class="text-sm font-black text-white">{{ explode(' ', auth()->user()->name)[0] }}</p>
                                 </div>
                                 <div
-                                    class="h-10 w-10 rounded-full border-2 border-cyan-400/30 bg-slate-800 flex items-center justify-center text-cyan-400">
+                                    class="h-10 w-10 rounded-full border-2 {{ auth()->user()->is_admin ? 'border-amber-400/40' : 'border-cyan-400/30' }} bg-slate-800 flex items-center justify-center {{ auth()->user()->is_admin ? 'text-amber-400' : 'text-cyan-400' }}">
                                     <i data-lucide="user" class="w-5 h-5"></i>
                                 </div>
                             </div>
@@ -108,9 +117,10 @@
                 </div>
             </div>
 
+            {{-- Mobile Menu --}}
             <div x-show="mobileMenuOpen" x-cloak x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
-                class="lg:hidden absolute top-20 left-0 w-full bg-[#0d1321] border-b border-slate-800 shadow-2xl">
+                class="lg:hidden absolute top-20 left-0 w-full bg-[#0a0e18] border-b border-slate-800 shadow-2xl">
                 <div class="p-6 space-y-4">
                     @auth
                         <a href="{{ url('/') }}"
@@ -125,6 +135,13 @@
                             class="flex items-center gap-3 p-4 rounded-xl font-bold uppercase tracking-widest text-xs {{ request()->routeIs('stocks.index') ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'bg-slate-900 text-slate-400' }}">
                             <i data-lucide="plus-square" class="w-4 h-4"></i> Add New Listing
                         </a>
+
+                        @if(auth()->user()->is_admin)
+                        <a href="{{ url('admin/payouts') }}"
+                            class="flex items-center gap-3 p-4 rounded-xl font-bold uppercase tracking-widest text-xs {{ request()->is('admin/payout*') ? 'bg-amber-400/10 text-amber-400 border border-amber-400/20' : 'bg-slate-900 text-slate-400' }}">
+                            <i data-lucide="wallet" class="w-4 h-4"></i> Admin Payout
+                        </a>
+                        @endif
 
                         <form action="{{ route('logout') }}" method="POST" class="pt-4 border-t border-slate-800">
                             @csrf
