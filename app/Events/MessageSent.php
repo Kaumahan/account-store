@@ -9,16 +9,30 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow; // <--- Use "Now"
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcastNow 
+class MessageSent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public Message $message) {}
+    public function __construct(public Message $message)
+    {
+    }
+
+    // public function broadcastOn(): array
+    // {
+    //     return [
+    //         new Channel('public-chat'),
+    //     ];
+    // }
 
     public function broadcastOn(): array
     {
-        return [
-            new Channel('public-chat'),
-        ];
+        // MUST match Vue: window.Echo.channel('public-chat')
+        return [new \Illuminate\Broadcasting\Channel('public-chat')];
+    }
+
+    public function broadcastAs(): string
+    {
+        // This allows Vue to listen for ".MessageSent"
+        return 'MessageSent';
     }
 }

@@ -60,7 +60,7 @@
                                 </a>
                                 <a href="{{ route('purchases.index') }}"
                                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all {{ request()->routeIs('purchases.index') ? 'bg-cyan-400/10 text-cyan-400' : 'text-slate-400 hover:text-white' }}">
-                                    <i data-lucide="package" class="w-3.5 h-3.5"></i> Inventory
+                                    <i data-lucide="package" class="w-3.5 h-3.5"></i> Vault
                                 </a>
                                 <a href="{{ route('stocks.index') }}"
                                     class="flex items-center gap-2 px-4 py-2 rounded-lg text-[11px] font-bold uppercase tracking-widest transition-all {{ request()->routeIs('stocks.index') ? 'bg-cyan-400/10 text-cyan-400' : 'text-slate-400 hover:text-white' }}">
@@ -115,15 +115,15 @@
                     @auth
                         <a href="{{ url('/') }}"
                             class="flex items-center gap-3 p-4 rounded-xl font-bold uppercase tracking-widest text-xs {{ request()->is('/') ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'bg-slate-900 text-slate-400' }}">
-                            <i data-lucide="layout-grid" class="w-4 h-4"></i> Terminal
+                            <i data-lucide="layout-grid" class="w-4 h-4"></i> Shop
                         </a>
                         <a href="{{ route('purchases.index') }}"
                             class="flex items-center gap-3 p-4 rounded-xl font-bold uppercase tracking-widest text-xs {{ request()->routeIs('purchases.index') ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'bg-slate-900 text-slate-400' }}">
-                            <i data-lucide="package" class="w-4 h-4"></i> Inventory
+                            <i data-lucide="package" class="w-4 h-4"></i> Vault
                         </a>
                         <a href="{{ route('stocks.index') }}"
                             class="flex items-center gap-3 p-4 rounded-xl font-bold uppercase tracking-widest text-xs {{ request()->routeIs('stocks.index') ? 'bg-cyan-400/10 text-cyan-400 border border-cyan-400/20' : 'bg-slate-900 text-slate-400' }}">
-                            <i data-lucide="plus-square" class="w-4 h-4"></i> Deploy
+                            <i data-lucide="plus-square" class="w-4 h-4"></i> Add New Listing
                         </a>
 
                         <form action="{{ route('logout') }}" method="POST" class="pt-4 border-t border-slate-800">
