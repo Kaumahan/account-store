@@ -36,7 +36,10 @@
         {{ product.name }}
       </h3>
 
-      <div class="mb-3 flex items-center gap-1.5">
+      <div 
+        @click="showReviews = true"
+        class="mb-3 flex cursor-pointer items-center gap-1.5 transition-opacity hover:opacity-70"
+      >
         <div class="flex items-center">
           <template v-for="star in 5" :key="star">
             <svg 
@@ -50,7 +53,7 @@
         </div>
         <div class="flex items-center gap-1">
           <span class="text-[11px] font-black text-slate-700">{{ dummyRating }}</span>
-          <span class="text-[10px] font-bold text-slate-400">({{ dummyReviewCount }} Reviews)</span>
+          <span class="text-[10px] font-bold text-indigo-500 underline decoration-indigo-200 underline-offset-2">({{ dummyReviewCount }} Reviews)</span>
         </div>
       </div>
 
@@ -78,13 +81,70 @@
         </button>
       </div>
     </div>
+
+    <Teleport to="body">
+      <div v-if="showReviews" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div 
+          class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+          @click="showReviews = false"
+        ></div>
+
+        <div class="relative w-full max-w-md scale-100 overflow-hidden rounded-3xl bg-white shadow-2xl transition-all">
+          <div class="border-b border-slate-100 p-6">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xl font-black text-slate-900">Product Reviews</h3>
+              <button @click="showReviews = false" class="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div class="mt-4 flex items-center gap-3">
+              <div class="flex items-baseline gap-1">
+                <span class="text-4xl font-black text-slate-900">{{ dummyRating }}.0</span>
+                <span class="text-sm font-bold text-slate-400">/ 5</span>
+              </div>
+              <div class="flex flex-col">
+                <div class="flex text-amber-400">
+                  <svg v-for="i in 5" :key="i" class="h-4 w-4 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ dummyReviewCount }} Total Reviews</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-h-[400px] overflow-y-auto p-6 scrollbar-hide">
+            <div class="space-y-6">
+              <div v-for="review in dummyReviews" :key="review.id" class="group/item">
+                <div class="mb-1 flex items-center justify-between">
+                  <span class="font-bold text-slate-900">{{ review.user }}</span>
+                  <span class="text-[9px] font-black uppercase tracking-tighter text-emerald-500">Verified</span>
+                </div>
+                <p class="text-sm italic leading-relaxed text-slate-600 group-hover/item:text-slate-900 transition-colors">
+                  "{{ review.comment }}"
+                </p>
+                <div class="mt-4 h-px w-full bg-slate-50"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-6">
+            <button 
+              @click="showReviews = false"
+              class="w-full rounded-2xl bg-slate-900 py-3.5 text-sm font-black uppercase tracking-widest text-white shadow-lg transition-transform active:scale-95"
+            >
+              Back to Store
+            </button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
+import { ref } from "vue";
 import { useToast } from "vue-toastification";
-
-const numberFormat = (val) => new Intl.NumberFormat().format(val);
 
 const props = defineProps({
   product: {
@@ -97,9 +157,21 @@ const props = defineProps({
   },
 });
 
+// UI State
+const showReviews = ref(false);
+
+// Formatting logic
+const numberFormat = (val) => new Intl.NumberFormat().format(val);
+
 // Dummy Data for Launch
 const dummyRating = 5;
 const dummyReviewCount = 12;
+const dummyReviews = [
+  { id: 1, user: "Angelo M.", comment: "Excellent service! The account details were delivered instantly after payment." },
+  { id: 2, user: "Sarah J.", comment: "Legit and very helpful support. Highly recommended for gamers!" },
+  { id: 3, user: "Kevin P.", comment: "Smooth transaction. The account is exactly as described in the listing." },
+  { id: 4, user: "Dianne L.", comment: "Best price I could find online. Will definitely buy again." },
+];
 
 const toast = useToast();
 
@@ -135,3 +207,14 @@ const handlePayment = (id) => {
   form.submit();
 };
 </script>
+
+<style scoped>
+/* Optional: Hide scrollbar for the review list for a cleaner look */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>
