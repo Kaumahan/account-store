@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Events\MessageSent;
 use App\Models\Message;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\PaymentController;
@@ -41,6 +42,11 @@ Route::post('/paymongo/callback', [PayMongoWebhookController::class, 'handle'])
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'throttle:120,1'])->group(function () {
+
+    // Page to write the report
+    Route::get('/payments/{payment}/report', [ReportController::class, 'create'])->name('payments.report');
+    // Save the report
+    Route::post('/payments/{payment}/report', [ReportController::class, 'store'])->name('reports.store');
 
     // --- High-Value Transactions (Heavily Protected) ---
     // Prevent automated balance drain or ticket-buying bots

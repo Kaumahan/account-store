@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Stock extends Model
 {
     protected $fillable = ['payment_id','product_id', 'data', 'is_sold'];
+    const STATUS_RECEIVED = 'received';
+    const STATUS_RESOLVED = 'resolved';
 
     /**
      * Automatic Encryption/Decryption
